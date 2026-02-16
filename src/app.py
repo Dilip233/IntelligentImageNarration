@@ -115,4 +115,9 @@ def health():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Note: Debug mode is enabled for development only
+    # In production, use a proper WSGI server like Gunicorn or uWSGI
+    # Example: gunicorn -w 4 -b 0.0.0.0:5000 src.app:app
+    import os
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
