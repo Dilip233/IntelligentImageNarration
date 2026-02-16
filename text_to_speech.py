@@ -39,7 +39,8 @@ class TextToSpeech:
             tts = gTTS(text=text, lang=self.language, slow=self.slow)
             
             # Create output directory if it doesn't exist
-            os.makedirs(os.path.dirname(output_path) if os.path.dirname(output_path) else '.', exist_ok=True)
+            output_dir = os.path.dirname(output_path) or '.'
+            os.makedirs(output_dir, exist_ok=True)
             
             # Save the audio file
             tts.save(output_path)
