@@ -4,6 +4,7 @@ Flask web application for Intelligent Image Narration System
 
 import os
 import uuid
+import threading
 from flask import Flask, render_template, request, jsonify, send_file, url_for
 from werkzeug.utils import secure_filename
 from src.image_narrator import ImageNarrator
@@ -31,15 +32,19 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(AUDIO_FOLDER, exist_ok=True)
 
-# Initialize narrator (lazy loading)
+# Initialize narrator (lazy loading with thread safety)
 narrator = None
+narrator_lock = threading.Lock()
 
 
 def get_narrator():
-    """Lazy load the narrator to avoid loading model on startup"""
+    """Thread-safe lazy load the narrator to avoid loading model on startup"""
     global narrator
     if narrator is None:
-        narrator = ImageNarrator()
+        with narrator_lock:
+            # Double-check locking pattern
+            if narrator is None:
+                narrator = ImageNarrator()
     return narrator
 
 

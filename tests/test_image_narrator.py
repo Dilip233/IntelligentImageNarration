@@ -5,6 +5,7 @@ Test suite for Intelligent Image Narration System
 import unittest
 import os
 import sys
+import tempfile
 from PIL import Image
 import io
 
@@ -20,20 +21,23 @@ class TestImageNarrator(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up test fixtures"""
+        # Create temporary directory for test files
+        cls.temp_dir = tempfile.mkdtemp()
+        
         # Create a test image
-        cls.test_image_path = '/tmp/test_image.jpg'
+        cls.test_image_path = os.path.join(cls.temp_dir, 'test_image.jpg')
         img = Image.new('RGB', (100, 100), color='red')
         img.save(cls.test_image_path)
         
-        cls.test_audio_path = '/tmp/test_audio.mp3'
+        cls.test_audio_path = os.path.join(cls.temp_dir, 'test_audio.mp3')
     
     @classmethod
     def tearDownClass(cls):
         """Clean up test fixtures"""
-        if os.path.exists(cls.test_image_path):
-            os.remove(cls.test_image_path)
-        if os.path.exists(cls.test_audio_path):
-            os.remove(cls.test_audio_path)
+        import shutil
+        # Clean up temporary directory and all files in it
+        if os.path.exists(cls.temp_dir):
+            shutil.rmtree(cls.temp_dir)
     
     def test_narrator_initialization(self):
         """Test that narrator can be initialized"""
