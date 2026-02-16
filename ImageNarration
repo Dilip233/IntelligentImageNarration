@@ -1,0 +1,81 @@
+from transformers import DetrImageProcessor, DetrForObjectDetection
+import torch
+from PIL import Image
+import requests
+
+url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+image = Image.open(requests.get(url, stream=True).raw)
+
+# you can specify the revision tag if you don't want the timm dependency
+processor = DetrImageProcessor.from_pretrained("facebook/detr-resnet-50", revision="no_timm")
+model = DetrForObjectDetection.from_pretrained("facebook/detr-resnet-50", revision="no_timm")
+
+inputs = processor(images=image, return_tensors="pt")
+outputs = model(**inputs)
+
+# convert outputs (bounding boxes and class logits) to COCO API
+# let's only keep detections with score > 0.9
+target_sizes = torch.tensor([image.size[::-1]])
+results = processor.post_process_object_detection(outputs, target_sizes=target_sizes, threshold=0.9)[0]
+
+for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
+    box = [round(i, 2) for i in box.tolist()]
+    print(
+            f"Detected {model.config.id2label[label.item()]} with confidence "
+            f"{round(score.item(), 3)} at location {box}"
+    )
+
+#=================================
+
+from collections import Counter
+
+# Extract detected labels (as strings)
+detected_labels = [
+    model.config.id2label[label.item()]
+    for label in results["labels"]
+]
+
+# Count occurrences
+counts = Counter(detected_labels)
+
+# Create natural language summary
+def generate_summary(counts):
+    if not counts:
+        return "No objects detected with the given confidence threshold."
+
+    parts = []
+    for label, count in counts.items():
+        if count == 1:
+            parts.append(f"one {label}")
+        else:
+            parts.append(f"{count} {label}s")
+
+    # Join into human-readable sentence
+    summary = "The image contains " + ", ".join(parts[:-1])
+    if len(parts) > 1:
+        summary += f", and {parts[-1]}."
+    else:
+        summary = "The image contains " + parts[0] + "."
+    return summary
+
+summary_text = generate_summary(counts)
+print(summary_text)
+
+#==============================================
+
+! pip install datasets soundfile librosa
+
+#===================================
+
+narrated_text = narrator(summary_text)
+
+
+print(narrated_text["sampling_rate"])
+
+
+from IPython.display import Audio as IPythonAudio
+
+IPythonAudio(
+    narrated_text["audio"][0],
+    rate=narrated_text["sampling_rate"]
+)
