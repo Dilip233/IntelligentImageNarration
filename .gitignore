@@ -39,6 +39,7 @@ Thumbs.db
 # Project specific
 uploads/
 static/audio/
+demo/
 *.mp3
 *.wav
 .env
