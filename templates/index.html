@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Image Narration System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header role="banner">
+            <h1 id="main-title">Intelligent Image Narration System</h1>
+            <p class="subtitle">Upload an image to receive an audio description for accessibility support</p>
+        </header>
+
+        <main role="main">
+            <section class="upload-section" aria-labelledby="upload-heading">
+                <h2 id="upload-heading" class="sr-only">Upload Image</h2>
+                
+                <form id="upload-form" enctype="multipart/form-data" aria-label="Image upload form">
+                    <div class="file-input-wrapper">
+                        <label for="image-input" class="file-label">
+                            <span class="file-label-text">Choose Image File</span>
+                            <input 
+                                type="file" 
+                                id="image-input" 
+                                name="image" 
+                                accept="image/*" 
+                                required
+                                aria-describedby="file-help"
+                            >
+                        </label>
+                        <p id="file-help" class="help-text">
+                            Supported formats: PNG, JPG, JPEG, GIF, BMP, WEBP (Max 16MB)
+                        </p>
+                    </div>
+                    
+                    <div class="preview-container" id="preview-container" aria-live="polite">
+                        <img id="image-preview" alt="Preview of uploaded image" style="display:none;">
+                    </div>
+                    
+                    <button 
+                        type="submit" 
+                        id="submit-btn" 
+                        class="btn btn-primary"
+                        aria-label="Upload and narrate image"
+                    >
+                        Generate Narration
+                    </button>
+                </form>
+
+                <div id="loading" class="loading" style="display:none;" role="status" aria-live="polite">
+                    <div class="spinner"></div>
+                    <p>Analyzing image and generating narration...</p>
+                </div>
+            </section>
+
+            <section class="results-section" id="results" style="display:none;" aria-labelledby="results-heading">
+                <h2 id="results-heading">Narration Results</h2>
+                
+                <div class="result-card">
+                    <h3>Image Description:</h3>
+                    <p id="caption-text" class="caption-text" role="region" aria-label="Generated image description"></p>
+                </div>
+
+                <div class="result-card audio-card">
+                    <h3>Audio Narration:</h3>
+                    <audio 
+                        id="audio-player" 
+                        controls 
+                        aria-label="Audio narration of the image"
+                        class="audio-player"
+                    >
+                        <source id="audio-source" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <button 
+                        id="replay-btn" 
+                        class="btn btn-secondary"
+                        aria-label="Replay audio narration"
+                    >
+                        Replay Audio
+                    </button>
+                </div>
+
+                <button 
+                    id="new-image-btn" 
+                    class="btn btn-primary"
+                    aria-label="Upload a new image"
+                >
+                    Upload New Image
+                </button>
+            </section>
+
+            <section class="error-section" id="error" style="display:none;" role="alert" aria-live="assertive">
+                <div class="error-card">
+                    <h3>Error</h3>
+                    <p id="error-text"></p>
+                    <button 
+                        id="retry-btn" 
+                        class="btn btn-secondary"
+                        aria-label="Try again"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer role="contentinfo">
+            <p>&copy; 2026 Intelligent Image Narration System - Accessibility for All</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
