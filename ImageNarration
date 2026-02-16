@@ -63,10 +63,15 @@ print(summary_text)
 
 #==============================================
 
-! pip install datasets soundfile librosa
+#! pip install datasets soundfile librosa
 
 #===================================
+from transformers import pipeline
 
+narrator = pipeline(
+    task="text-to-speech",
+    model="suno/bark-small",
+)
 narrated_text = narrator(summary_text)
 
 
